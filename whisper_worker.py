@@ -63,7 +63,11 @@ def transcribe_audio(audio_path: str, model_size: str = MODEL_SIZE) -> list[dict
         language="ru",
         beam_size=5,
         vad_filter=True,
-        vad_parameters={"min_silence_duration_ms": 400},
+        vad_parameters={
+            "threshold": 0.3,               # default 0.5 — lower = keeps more speech
+            "min_speech_duration_ms": 100,  # don't drop short utterances
+            "min_silence_duration_ms": 800, # gap needed to split segments
+        },
     )
 
     result = []
