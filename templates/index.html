@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Интервью Ассистент</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app">
+
+    <header class="header">
+      <div class="header-icon">🎙</div>
+      <h1>Интервью Ассистент</h1>
+      <p class="subtitle">Локальная запись и транскрибация · все данные остаются на вашем компьютере</p>
+    </header>
+
+    <main>
+
+      <!-- ── Candidate name ─────────────────────────────────────────────── -->
+      <section class="card" id="setup-section">
+        <label class="field-label" for="candidate-name">Имя кандидата</label>
+        <input
+          type="text"
+          id="candidate-name"
+          class="text-input"
+          placeholder="Иванов Иван Иванович"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </section>
+
+      <!-- ── Recording controls ─────────────────────────────────────────── -->
+      <section class="card recording-card">
+        <button id="record-btn" class="btn-record" onclick="toggleRecording()">
+          <span class="btn-dot" id="btn-dot">●</span>
+          <span id="btn-label">Начать запись</span>
+        </button>
+
+        <div class="timer" id="timer">00:00:00</div>
+
+        <div class="status-row">
+          <span class="status-dot idle" id="status-dot"></span>
+          <span id="status-text">Готов к записи</span>
+        </div>
+      </section>
+
+      <!-- ── Results (injected when done) ──────────────────────────────── -->
+      <section id="results-section" style="display:none">
+        <div id="results-container"></div>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      Данные сохраняются в папку <code>outputs/</code> рядом с приложением
+    </footer>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
