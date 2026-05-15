@@ -1,13 +1,15 @@
 <!-- Results fragment — injected into #results-container via fetch() -->
 <div class="card results-card">
   <h2>Результаты интервью</h2>
-  <p class="results-meta">{{ candidate_name }} · {{ session.created_at[:10] }}</p>
+  <p class="results-meta">
+    {{ candidate_name }}{% if position %} · {{ position }}{% endif %} · {{ session.created_at[:10] }}
+    {% if ai_used %}<span class="ai-badge">✦ YandexGPT</span>{% endif %}
+  </p>
 
   <!-- ── Tabs ──────────────────────────────────────────────────────────── -->
   <div class="tabs" role="tablist">
     <button class="tab active" onclick="showTab('diarised', this)" role="tab">📝 Транскрипт</button>
     <button class="tab"        onclick="showTab('summary',  this)" role="tab">📋 Резюме</button>
-    <button class="tab"        onclick="showTab('notes',    this)" role="tab">✏️ Заметки</button>
     <button class="tab"        onclick="showTab('cleaned',  this)" role="tab">Очищенный</button>
     <button class="tab"        onclick="showTab('raw',      this)" role="tab">Сырой текст</button>
   </div>
@@ -18,9 +20,6 @@
   </div>
   <div id="tab-summary" class="tab-content" role="tabpanel">
     <pre class="transcript">{{ summary }}</pre>
-  </div>
-  <div id="tab-notes" class="tab-content" role="tabpanel">
-    <pre class="transcript">{{ recruiter_notes }}</pre>
   </div>
   <div id="tab-cleaned" class="tab-content" role="tabpanel">
     <pre class="transcript">{{ cleaned_transcript }}</pre>
@@ -38,9 +37,6 @@
     <a class="btn-secondary"
        href="/sessions/{{ session.id }}/files/summary.md"
        download>⬇ Резюме .md</a>
-    <a class="btn-secondary"
-       href="/sessions/{{ session.id }}/files/recruiter_notes.md"
-       download>⬇ Заметки .md</a>
   </div>
 
   <p class="output-path">

@@ -69,20 +69,64 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+@app.get("/settings", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    from yandex_gpt import load_config
+    cfg = load_config().get("yandex_gpt", {})
+    return templates.TemplateResponse("settings.html", {"request": request, "cfg": cfg})
+
+
+@app.post("/settings")
+async def save_settings(
+    request: Request,
+    api_key:   str = Form(default=""),
+    folder_id: str = Form(default=""),
+    model:     str = Form(default="yandexgpt"),
+    enabled:   str = Form(default=""),
+):
+    from yandex_gpt import load_config, save_config
+    data = load_config()
+    data["yandex_gpt"] = {
+        "api_key":   api_key.strip(),
+        "folder_id": folder_id.strip(),
+        "model":     model.strip() or "yandexgpt",
+        "enabled":   enabled == "on",
+    }
+    save_config(data)
+    cfg = data["yandex_gpt"]
+    return templates.TemplateResponse("settings.html", {
+        "request": request,
+        "cfg": cfg,
+        "saved": True,
+    })
+
+
+@app.post("/settings/test")
+async def test_settings():
+    from yandex_gpt import test_connection
+    ok, message = test_connection()
+    return JSONResponse({"ok": ok, "message": message})
+
+
 @app.post("/sessions")
-async def create_session(candidate_name: str = Form(default="")):
+async def create_session(
+    candidate_name: str = Form(default=""),
+    position:       str = Form(default=""),
+):
     session_id = uuid.uuid4().hex[:8]
     sessions[session_id] = {
-        "id": session_id,
+        "id":             session_id,
         "candidate_name": candidate_name.strip() or "Кандидат",
-        "created_at": datetime.now().isoformat(),
-        "status": "created",
-        "error": None,
-        "audio_path": None,
-        "output_dir": None,
-        "results": {},
+        "position":       position.strip(),
+        "created_at":     datetime.now().isoformat(),
+        "status":         "created",
+        "error":          None,
+        "audio_path":     None,
+        "output_dir":     None,
+        "results":        {},
     }
-    logger.info("Создана сессия %s для '%s'", session_id, sessions[session_id]["candidate_name"])
+    logger.info("Создана сессия %s для '%s' (%s)", session_id,
+                sessions[session_id]["candidate_name"], position or "—")
     return JSONResponse({"session_id": session_id})
 
 
@@ -177,8 +221,9 @@ async def _process_session(session_id: str) -> None:
     session = sessions[session_id]
 
     try:
-        audio_path = session["audio_path"]
+        audio_path     = session["audio_path"]
         candidate_name = session["candidate_name"]
+        position       = session["position"]
 
         date_str = datetime.now().strftime("%Y-%m-%d")
         safe_name = _slugify(candidate_name)
@@ -206,7 +251,7 @@ async def _process_session(session_id: str) -> None:
         session["status"] = "summarizing"
         logger.info("[%s] Генерация файлов...", session_id)
         results: dict = await loop.run_in_executor(
-            executor, generate_outputs, diarized, candidate_name, output_dir
+            executor, generate_outputs, diarized, candidate_name, position, output_dir
         )
 
         # Copy original recording to output dir
@@ -217,6 +262,7 @@ async def _process_session(session_id: str) -> None:
         metadata = {
             "session_id":     session_id,
             "candidate_name": candidate_name,
+            "position":       position,
             "created_at":     session["created_at"],
             "processed_at":   datetime.now().isoformat(),
             "audio_file":     rec_src.name,

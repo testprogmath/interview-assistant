@@ -17,17 +17,32 @@
 
     <main>
 
-      <!-- ── Candidate name ─────────────────────────────────────────────── -->
+      <!-- ── Candidate info ────────────────────────────────────────────────── -->
       <section class="card" id="setup-section">
-        <label class="field-label" for="candidate-name">Имя кандидата</label>
-        <input
-          type="text"
-          id="candidate-name"
-          class="text-input"
-          placeholder="Иванов Иван Иванович"
-          autocomplete="off"
-          spellcheck="false"
-        >
+        <div class="fields-row">
+          <div class="field">
+            <label class="field-label" for="candidate-name">Имя кандидата</label>
+            <input
+              type="text"
+              id="candidate-name"
+              class="text-input"
+              placeholder="Иванов Иван Иванович"
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+          <div class="field">
+            <label class="field-label" for="position">Позиция / роль</label>
+            <input
+              type="text"
+              id="position"
+              class="text-input"
+              placeholder="Senior Backend Engineer"
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+        </div>
       </section>
 
       <!-- ── Recording controls ─────────────────────────────────────────── -->
@@ -53,7 +68,8 @@
     </main>
 
     <footer class="footer">
-      Данные сохраняются в папку <code>outputs/</code> рядом с приложением
+      Данные сохраняются в папку <code>outputs/</code> &nbsp;·&nbsp;
+      <a href="/settings" class="footer-link">⚙ Настройки YandexGPT</a>
     </footer>
 
   </div>

@@ -12,5 +12,8 @@ __pycache__/
 # Server PID file
 .server.pid
 
+# Local config with API keys — never commit
+config.json
+
 # macOS metadata
 .DS_Store

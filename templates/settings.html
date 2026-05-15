@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Настройки — Интервью Ассистент</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app">
+
+    <header class="header">
+      <div class="header-icon">⚙</div>
+      <h1>Настройки YandexGPT</h1>
+      <p class="subtitle">Автоматическая генерация резюме интервью</p>
+    </header>
+
+    <main>
+      <section class="card">
+
+        {% if saved %}
+        <div class="alert alert-ok">Настройки сохранены.</div>
+        {% endif %}
+
+        <form method="post" action="/settings">
+
+          <div class="field" style="margin-bottom: 20px;">
+            <label class="field-label">
+              <input type="checkbox" name="enabled" id="enabled"
+                {% if cfg.get('enabled') %}checked{% endif %}>
+              &nbsp;Использовать YandexGPT для генерации резюме
+            </label>
+          </div>
+
+          <div class="field" style="margin-bottom: 18px;">
+            <label class="field-label" for="api_key">API-ключ</label>
+            <input
+              type="password"
+              id="api_key"
+              name="api_key"
+              class="text-input"
+              value="{{ cfg.get('api_key', '') }}"
+              placeholder="AQVN…"
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <p class="field-hint">
+              Создайте в <a href="https://console.yandex.cloud/" target="_blank">Yandex Cloud Console</a>
+              → IAM → Сервисные аккаунты → Создать ключ → API-ключ
+            </p>
+          </div>
+
+          <div class="field" style="margin-bottom: 18px;">
+            <label class="field-label" for="folder_id">Идентификатор каталога (Folder ID)</label>
+            <input
+              type="text"
+              id="folder_id"
+              name="folder_id"
+              class="text-input"
+              value="{{ cfg.get('folder_id', '') }}"
+              placeholder="b1g…"
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <p class="field-hint">
+              Yandex Cloud Console → выберите каталог → скопируйте ID из URL или страницы каталога
+            </p>
+          </div>
+
+          <div class="field" style="margin-bottom: 28px;">
+            <label class="field-label" for="model">Модель</label>
+            <select id="model" name="model" class="text-input">
+              <option value="yandexgpt"      {% if cfg.get('model','yandexgpt') == 'yandexgpt' %}selected{% endif %}>
+                YandexGPT (полная, рекомендуется)
+              </option>
+              <option value="yandexgpt-lite" {% if cfg.get('model') == 'yandexgpt-lite' %}selected{% endif %}>
+                YandexGPT Lite (быстрее, дешевле)
+              </option>
+            </select>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn-save">Сохранить</button>
+            <button type="button" class="btn-secondary" onclick="testConnection()">Проверить соединение</button>
+          </div>
+
+        </form>
+
+        <div id="test-result" class="alert" style="display:none; margin-top: 16px;"></div>
+
+      </section>
+
+      <div style="text-align:center; margin-top: 8px;">
+        <a href="/" class="footer-link">← Вернуться к записи</a>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    async function testConnection() {
+      const el = document.getElementById('test-result');
+      el.style.display = 'block';
+      el.className = 'alert';
+      el.textContent = 'Проверяем соединение…';
+
+      try {
+        const res  = await fetch('/settings/test', { method: 'POST' });
+        const data = await res.json();
+        el.className = 'alert ' + (data.ok ? 'alert-ok' : 'alert-err');
+        el.textContent = data.message;
+      } catch (e) {
+        el.className = 'alert alert-err';
+        el.textContent = 'Ошибка: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>

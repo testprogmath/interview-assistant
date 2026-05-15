@@ -34,8 +34,10 @@ async function startRecording() {
 
   // Create a session on the server
   const candidateName = document.getElementById("candidate-name").value.trim();
+  const position      = document.getElementById("position").value.trim();
   const fd = new FormData();
   fd.append("candidate_name", candidateName || "Кандидат");
+  fd.append("position", position);
 
   let sessionId;
   try {
